@@ -20,7 +20,6 @@ import lombok.NoArgsConstructor;
 @Table(name="employees")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Employee {
 	
 	@Id

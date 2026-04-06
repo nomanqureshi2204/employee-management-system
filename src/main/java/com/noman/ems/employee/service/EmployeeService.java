@@ -4,17 +4,17 @@ import java.util.List;
 
 import com.noman.ems.employee.entity.Employee;
 
-public interface EmployeeService {
-	// add Employee 
-	Employee addEmployee(Employee employee);
-	
-	//set password by using token 
-	String setPassword(String token,String password);
-	
-	//get all Employees 
-	List<Employee>getAllEmployees();
-}
 
+public interface EmployeeService {
+
+    Employee save(Employee emp);
+    
+    List<Employee> getAll();
+    
+    Employee getById(String id);
+    
+    void delete(String id);
+}
 
 
 

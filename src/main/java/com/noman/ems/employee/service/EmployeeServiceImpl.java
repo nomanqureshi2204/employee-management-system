@@ -31,7 +31,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		// fetchin last employee with highest id
 		Employee lastEmployee = employeeRepository.findTopByOrderByIdDesc().orElse(null);
 
-		// agar koi employee nahinhai
+		// agar koi employee nahin hai
 		if (lastEmployee == null) {
 			return "JTC-001";
 		}
@@ -65,11 +65,46 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 		String tokenValue = UUID.randomUUID().toString();
 
-		Token token = Token.builder().email(savedEmployee.getEmail()) // kis email ke liye token
-				.token(tokenValue) // unique token
-				.expiryTime(LocalDateTime.now().plusMinutes(5)) // 5 min expiry
-				.used(false) // abhi use nahi hua
-				.build();
+		//token object create 
+		Token token = new Token();
+		token.setToken(tokenValue);
+		token.setEmail(savedEmployee.getEmail());
+		token.setExpiryTime(LocalDateTime.now().plusMinutes(5));
+		token.setUsed(false);
+		
+		// save token 
+		tokenRepository.save(token);
+		
+		return savedEmployee; 
+		
+		// TODO: Email send karna (later)
 
 	}
+	
+	@Override
+	public String setPassword(String tokenValue,String newPassword) {
+		
+		
+		return "";
+	}
+
+	@Override
+	public List<Employee> getAllEmployees() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
