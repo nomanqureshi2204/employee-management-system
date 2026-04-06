@@ -12,6 +12,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, String>{
 	//finding Employee by Email 
 	Optional<Employee>findByEmail(String email);
 	
+	Optional<Employee> findTopByOrderByIdDesc();
+	
 	//finding Employee on Date range
 	List<Employee>findByDateOfJoiningBetween(LocalDate start,LocalDate end);
 	

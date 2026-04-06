@@ -20,7 +20,6 @@ import jakarta.persistence.Table;
 @NoArgsConstructor 
 @AllArgsConstructor 
 @Builder
-
 @Table(name = "tokens") 
 // table ka naam
 

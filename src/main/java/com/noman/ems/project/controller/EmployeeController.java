@@ -19,14 +19,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.noman.ems.employee.entity.Employee;
-import com.noman.ems.employee.service.EmployeeService;
+import com.noman.ems.employee.service.EmployeeServiceImpl;
 
 @RestController
 @RequestMapping("/employees")
 public class EmployeeController {
 	
 	@Autowired
-	private EmployeeService employeeService;
+	private EmployeeServiceImpl employeeService;
 	
 	
 	
