@@ -9,29 +9,25 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Table(name="clients")
 public class Client {
+	// Client ID auto-generated like CLIENT-001
 	@Id
 	private String clientId;
 	
-	private String companyName;
-	
-	private String email;
-	
-	private String password;
-	
+	private String clientName;
 	private LocalDate relationshipDate;
 	
-	// One client → many projects
+
+	
+	// One client can have  multiple projects
 	@OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
 	private List<Project>projects;
 	

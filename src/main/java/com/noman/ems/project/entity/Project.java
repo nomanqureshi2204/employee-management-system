@@ -12,32 +12,34 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "projects")
 public class Project {
+	// Project ID auto-generated like PROJECT-001
 	@Id
 	private String projectId;
-	
+
 	private String projectName;
-	
 	private LocalDate startDate;
-	
 	private LocalDate endDate;
-	
-	//many projects belong to one client 
+
+	// many projects belong to one client
 	@ManyToOne
-	@JoinColumn(name="client_id")
+	@JoinColumn(name = "client_id")
 	private Client client;
-	
-	//one project has many employees 
+
+	// one project can have multiple employees
 	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-	private List<Employee>employees;
+	private List<Employee> employees;
+
+	public Project() {
+	}
 
 	public String getProjectId() {
 		return projectId;
@@ -86,16 +88,5 @@ public class Project {
 	public void setEmployees(List<Employee> employees) {
 		this.employees = employees;
 	}
-	
-	
-	
+
 }
-
-
-
-
-
-
-
-
-

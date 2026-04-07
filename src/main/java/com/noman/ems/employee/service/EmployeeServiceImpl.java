@@ -16,83 +16,29 @@ import com.noman.ems.employee.repository.EmployeeRepository;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
-
 	@Autowired
-	private EmployeeRepository employeeRepository;
-
-	@Autowired
-	private TokenRepository tokenRepository;
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
-	// generate Employee Id
-	private String generateEmployeeId() {
-		// fetchin last employee with highest id
-		Employee lastEmployee = employeeRepository.findTopByOrderByIdDesc().orElse(null);
-
-		// agar koi employee nahin hai
-		if (lastEmployee == null) {
-			return "JTC-001";
-		}
-
-		// if last employee id (example: JTC-005)
-		String lastId = lastEmployee.getEmployeeId();
-
-		// extract number
-		int num = Integer.parseInt(lastId.split("-")[1]);
-
-		num++; // next number
-
-		// format: JTC-006
-		return String.format("JTC-%03d", num);
-	}
-
-	// add employee
+	private EmployeeRepository repo;
+	
 	@Override
-	public Employee addEmployee(Employee employee) {
-
-		// custom employee id generate
-		employee.setEmployeeId(generateEmployeeId());
-
-		// set current date
-		employee.setDateOfJoining(LocalDate.now());
-
-		// employee save
-		Employee savedEmployee = employeeRepository.save(employee);
-
-		// token generate
-
-		String tokenValue = UUID.randomUUID().toString();
-
-		//token object create 
-		Token token = new Token();
-		token.setToken(tokenValue);
-		token.setEmail(savedEmployee.getEmail());
-		token.setExpiryTime(LocalDateTime.now().plusMinutes(5));
-		token.setUsed(false);
-		
-		// save token 
-		tokenRepository.save(token);
-		
-		return savedEmployee; 
-		
-		// TODO: Email send karna (later)
-
+	public Employee save(Employee emp) {
+		return repo.save(emp);
 	}
 	
 	@Override
-	public String setPassword(String tokenValue,String newPassword) {
-		
-		
-		return "";
+	public List<Employee> getAll() {
+		return repo.findAll();
 	}
-
+	
 	@Override
-	public List<Employee> getAllEmployees() {
-		// TODO Auto-generated method stub
-		return null;
+	public Employee getById(String id){
+		return repo.findById(id).orElse(null);
 	}
+	
+	@Override
+	public void delete(String id) {
+		repo.deleteById(id);
+	}
+	
 }
 
 
