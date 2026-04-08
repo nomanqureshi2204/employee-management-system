@@ -13,24 +13,42 @@ public class ClientServiceImpl implements ClientService{
 	@Autowired ClientRepository repo;
 	
 	@Override
-    public Client save(Client client) {
+    public Client add(Client client) {
         return repo.save(client);
     }
 
     @Override
-    public List<Client> getAll() {
+    public List<Client> getAllClients() {
         return repo.findAll();
     }
 
     @Override
-    public Client getById(String id) {
-        return repo.findById(id).orElse(null);
+    public Client getClientById(String id) {
+        return repo.findById(id)
+        		.orElseThrow(()->new RuntimeException("Client not found"));
     }
     
     @Override
-    public void delete(String id) {
+    public Client updateClient(String id,Client client) {
+    	Client existing = repo.findById(id)
+    					  .orElse(null);
+    	
+    	if(existing != null) {
+    		existing.setClientName(client.getClientName());
+        	existing.setRelationshipDate(client.getRelationshipDate());
+    	}
+    	
+    	return repo.save(existing);
+    	
+    }
+    
+    @Override
+    public void deleteClient(String id) {
         repo.deleteById(id);
     }
 	
 	
 }
+
+
+

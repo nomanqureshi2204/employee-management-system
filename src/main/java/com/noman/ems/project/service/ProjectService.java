@@ -5,10 +5,14 @@ import java.util.List;
 import com.noman.ems.project.entity.Project;
 
 public interface ProjectService {
-	
-	Project save(Project project);
-	List<Project>getAll();
-	Project getById(String id);
-	void delete(String id);
-	
+
+	Project add(Project project);
+
+	List<Project> getAllProjects();
+
+	Project getProjectById(String id);
+
+	Project updateProject(String id, Project project);
+
+	void deleteProject(String id);
 }

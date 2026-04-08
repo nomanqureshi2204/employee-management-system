@@ -1,6 +1,7 @@
 package com.noman.ems.project.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.noman.ems.client.entity.Client;
@@ -36,7 +37,7 @@ public class Project {
 
 	// one project can have multiple employees
 	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-	private List<Employee> employees;
+	private List<Employee> employees = new ArrayList<>();
 
 	public Project() {
 	}

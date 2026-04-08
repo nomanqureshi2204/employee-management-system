@@ -7,13 +7,15 @@ import com.noman.ems.employee.entity.Employee;
 
 public interface EmployeeService {
 
-    Employee save(Employee emp);
+    Employee add(Employee emp);
     
-    List<Employee> getAll();
+    List<Employee> getAllEmployees();
     
-    Employee getById(String id);
+    Employee getEmployeeById(String id);
     
-    void delete(String id);
+    void deleteEmployee(String id);
+    
+    Employee updateEmployee(String id,Employee emp);
 }
 
 

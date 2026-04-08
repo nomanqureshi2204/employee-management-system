@@ -3,7 +3,6 @@ package com.noman.ems.employee.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-
 import com.noman.ems.project.entity.Project;
 import com.noman.ems.util.IdGenerator;
 
@@ -20,32 +19,39 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="employees")
+@Table(name = "employees")
 
 public class Employee {
-	
+
 	@Id
 	private String employeeId;
-	
+
 	private String name;
 	private String dept;
-	
+
 	@Column(unique = true)
 	private String email;
-	
-	
+
 	private String phone;
-	
-	private LocalDate JoiningDate;
-	
-	
-	
+
+	private LocalDate joiningDate;
+
 	// Many employee can belong to one project
 	@ManyToOne
 	@JoinColumn(name = "project_id")
 	private Project project;
+
+	// Login related fields (Phase 5 ke liye ready)
+	// -------------------------------
+//    private String password;
+//    private int failedAttempts;
+//    private boolean accountLocked;
+//    private LocalDateTime lockTime;
 	
-	public Employee() {}
+	
+
+	public Employee() {
+	}
 
 	public String getEmployeeId() {
 		return employeeId;
@@ -88,11 +94,11 @@ public class Employee {
 	}
 
 	public LocalDate getJoiningDate() {
-		return JoiningDate;
+		return joiningDate;
 	}
 
 	public void setJoiningDate(LocalDate joiningDate) {
-		JoiningDate = joiningDate;
+		this.joiningDate = joiningDate;
 	}
 
 	public Project getProject() {
@@ -102,25 +108,5 @@ public class Employee {
 	public void setProject(Project project) {
 		this.project = project;
 	}
-	
-	}
 
-	
-
-	
-	
-	
-	
-	
-	
-	
 }
-
-
-
-
-
-
-
-
-
