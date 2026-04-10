@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.noman.ems.client.entity.Client;
 import com.noman.ems.employee.entity.Employee;
+import com.noman.ems.util.IdGenerator;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -13,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,6 +40,8 @@ public class Project {
 	// one project can have multiple employees
 	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
 	private List<Employee> employees = new ArrayList<>();
+
+	
 
 	public Project() {
 	}

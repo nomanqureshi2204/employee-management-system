@@ -1,8 +1,10 @@
 package com.noman.ems.employee.service;
 
+import com.noman.ems.util.IdGenerator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +18,29 @@ import com.noman.ems.employee.repository.EmployeeRepository;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
+	private final IdGenerator idGenerator;
 	@Autowired
 	private EmployeeRepository repo;
+
+	EmployeeServiceImpl(IdGenerator idGenerator) {
+		this.idGenerator = idGenerator;
+	}
 	
 	@Override
 	public Employee add(Employee emp) {
+		// get last Employee ID from DB 
+		String lastId = repo.findTopByOrderByEmployeeIdDesc()
+				.map(Employee::getEmployeeId)
+				.orElse(null);
+		
+		// generate new ID safely 
+		emp.setEmployeeId(idGenerator.generateEmployeeId(lastId));
+		
+		// set joining date if null 
+		
+		if(emp.getJoiningDate() == null) {
+			emp.setJoiningDate(LocalDate.now());
+		}
 		return repo.save(emp);
 	}
 	
@@ -41,16 +61,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 	
 	@Override
 	public Employee updateEmployee(String id,Employee emp) {
-		
-		Employee existing = repo.findById(id).orElse(null);
-		
-		if(existing != null) {
-			existing.setName(emp.getName());
-			existing.setDept(emp.getDept());
-			existing.setPhone(emp.getPhone());
+		Optional<Employee>existing = repo.findById(id);
+		if(existing.isPresent()) {
+			Employee old = existing.get();
+			old.setName(emp.getName());
+			old.setDept(emp.getDept());
+			old.setPhone(emp.getPhone());
+			old.setProject(emp.getProject()); // project can be null 
+			return repo.save(old);
 		}
-		
-		return repo.save(existing);
+		return null;  // throw exception 
 	}
 	
 }

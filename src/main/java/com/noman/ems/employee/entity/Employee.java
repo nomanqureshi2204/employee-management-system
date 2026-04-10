@@ -35,15 +35,19 @@ public class Employee {
 	private String phone;
 
 	private LocalDate joiningDate;
+	
+	private String password;
 
 	// Many employee can belong to one project
 	@ManyToOne
 	@JoinColumn(name = "project_id")
 	private Project project;
+	
+	
 
 	// Login related fields (Phase 5 ke liye ready)
 	// -------------------------------
-//    private String password;
+
 //    private int failedAttempts;
 //    private boolean accountLocked;
 //    private LocalDateTime lockTime;

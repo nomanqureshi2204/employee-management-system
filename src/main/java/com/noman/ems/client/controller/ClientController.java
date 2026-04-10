@@ -41,9 +41,9 @@ public class ClientController {
 	}
 	
 	//update 
-	@PutMapping("/{id}")
+	@PutMapping("/update")
 	public Client updateClient(@PathVariable String id,@RequestBody Client client) {
-		return service.updateClient(id, client);
+		return service.updateClient(client);
 	}
 	
 	//delete

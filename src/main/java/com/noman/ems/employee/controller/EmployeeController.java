@@ -44,7 +44,8 @@ public class EmployeeController {
 	//update 
 	@PutMapping("/{id}")
 	public Employee update(@PathVariable String id,@RequestBody Employee emp) {
-		return service.updateEmployee(id, emp);
+		
+		return service.updateEmployee(id,emp);
 	}
 	
 	//delete 

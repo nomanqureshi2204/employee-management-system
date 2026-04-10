@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.noman.ems.project.entity.Project;
+import com.noman.ems.util.IdGenerator;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,6 +47,8 @@ public class Client {
 	 // One client → many contact persons
 	@OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
 	private List<ContactPerson>contactPersons = new ArrayList<>();
+	
+	
 
 	public String getClientId() {
 		return clientId;
