@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.noman.ems.client.entity.Client;
 import com.noman.ems.employee.entity.Employee;
 import com.noman.ems.util.IdGenerator;
@@ -35,6 +37,7 @@ public class Project {
 	// many projects belong to one client
 	@ManyToOne
 	@JoinColumn(name = "client_id")
+	@JsonBackReference
 	private Client client;
 
 	// one project can have multiple employees

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.noman.ems.project.entity.Project;
 import com.noman.ems.util.IdGenerator;
 
@@ -31,8 +32,8 @@ public class Client {
 	private LocalDate relationshipDate;
 	
 	
-//	 @Column(unique = true)
-//	 private String email;
+	 @Column(unique = true)
+	 private String email;
 //
 //	 private String password;
 //	 private int failedAttempts;
@@ -42,10 +43,12 @@ public class Client {
 	
 	// One client can have  multiple projects
 	@OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private List<Project>projects = new ArrayList<>();
 	
 	 // One client → many contact persons
 	@OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private List<ContactPerson>contactPersons = new ArrayList<>();
 	
 	

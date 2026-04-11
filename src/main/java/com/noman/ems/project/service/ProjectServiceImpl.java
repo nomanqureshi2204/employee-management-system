@@ -65,6 +65,10 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void deleteProject(String id) {
+    	if (!repo.existsById(id)) {
+	        throw new RuntimeException("Invalid Project ID");
+	    }
+		repo.deleteById(id);
         repo.deleteById(id);
     }
 }

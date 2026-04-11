@@ -56,6 +56,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 	
 	@Override
 	public void deleteEmployee(String id) {
+		if (!repo.existsById(id)) {
+	        throw new RuntimeException("Invalid Employee ID");
+	    }
 		repo.deleteById(id);
 	}
 	

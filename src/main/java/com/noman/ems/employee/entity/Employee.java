@@ -3,6 +3,9 @@ package com.noman.ems.employee.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.noman.ems.project.entity.Project;
 import com.noman.ems.util.IdGenerator;
 
@@ -41,6 +44,7 @@ public class Employee {
 	// Many employee can belong to one project
 	@ManyToOne
 	@JoinColumn(name = "project_id")
+	@JsonIgnoreProperties("employees")
 	private Project project;
 	
 	

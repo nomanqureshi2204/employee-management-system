@@ -1,6 +1,10 @@
 package com.noman.ems.client.entity;
 
 import lombok.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,6 +35,7 @@ public class ContactPerson {
     
     @ManyToOne
     @JoinColumn(name = "client_id")
+    @JsonBackReference
     private Client client;
     
     public ContactPerson() {}
