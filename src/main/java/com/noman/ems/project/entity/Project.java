@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.noman.ems.client.entity.Client;
 import com.noman.ems.employee.entity.Employee;
@@ -37,11 +39,12 @@ public class Project {
 	// many projects belong to one client
 	@ManyToOne
 	@JoinColumn(name = "client_id")
-	@JsonBackReference
+	@JsonIgnoreProperties("projects")
 	private Client client;
 
 	// one project can have multiple employees
 	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+	@JsonIgnore
 	private List<Employee> employees = new ArrayList<>();
 
 	

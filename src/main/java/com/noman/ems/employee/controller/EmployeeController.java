@@ -1,5 +1,6 @@
 package com.noman.ems.employee.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.noman.ems.employee.entity.Employee;
@@ -54,6 +56,39 @@ public class EmployeeController {
 		service.deleteEmployee(id);
 		return "Deleted Successfully";
 	}
+	
+	// get employee basis of email
+	@GetMapping("/email/{email}")
+	public Employee getByEmail(@PathVariable String email) {
+		return service.getEmployeeByEmail(email);
+	}
+	
+	@GetMapping("date-range")
+	public List<Employee>getByDateRange(@RequestParam LocalDate startDate,
+								@RequestParam LocalDate endDate){
+		return service.getEmployeesByDateRange(startDate, endDate);
+	}	
+	
+	@PutMapping("/{empId}/assign/{projectId}")
+	public Employee assignProject(
+			@PathVariable String empId,
+			@PathVariable String projectId) {
+		
+		return service.assignEmployeeToProject(empId, projectId);
+	}
+	
+	@PutMapping("/{empId}/release/{projectId}")
+	public String releaseProject(
+			@PathVariable String empId,
+			@PathVariable String projectId) {
+		
+		return service.releaseEmployeeFromProject(empId, projectId);
+	}
+	
+	@GetMapping("/bench")
+    public List<Employee>getBenchEmployees(){
+    	return service.getBenchEmployee();
+    }
 }
 
 

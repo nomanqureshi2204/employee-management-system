@@ -10,6 +10,9 @@ import com.noman.ems.employee.entity.Employee;
 
 public interface EmployeeRepository extends JpaRepository<Employee, String>{
 	Optional<Employee> findTopByOrderByEmployeeIdDesc();
+	Optional<Employee> findByEmail(String email);
+	List<Employee>findByjoiningDateBetween(LocalDate startDate,LocalDate endDate);
+	List<Employee>findByProjectIsNull();
 }
 
 

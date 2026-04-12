@@ -6,6 +6,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.noman.ems.client.entity.Client;
+import com.noman.ems.client.repository.ClientRepository;
+import com.noman.ems.employee.entity.Employee;
 import com.noman.ems.project.entity.Project;
 import com.noman.ems.project.repository.ProjectRepository;
 import com.noman.ems.util.IdGenerator;
@@ -14,13 +17,16 @@ import com.noman.ems.util.IdGenerator;
 public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
-    private ProjectRepository repo;
+    private ProjectRepository projectRepo;
+    
+    @Autowired 
+    ClientRepository clientRepo;
 
     // add a new project with auto-genrated ID
     @Override
     public Project add(Project project) {
     	// get last project ID from DB
-    	String lastId = repo.findTopByOrderByProjectIdDesc()
+    	String lastId = projectRepo.findTopByOrderByProjectIdDesc()
     			.map(Project::getProjectId)
     			.orElse(null);
     	// generate new project id 
@@ -30,45 +36,84 @@ public class ProjectServiceImpl implements ProjectService {
     	project.setProjectId(newId);
     	
     	// save project to DB 
-        return repo.save(project);
+        return projectRepo.save(project);
     }
 
     @Override
     public List<Project> getAllProjects() {
-        return repo.findAll();
+        return projectRepo.findAll();
     }
 
     @Override
     public Project getProjectById(String id) {
-        return repo.findById(id).orElse(null);
+        return projectRepo.findById(id).orElse(null);
     }
     
     //update project info (except projectId) 
     @Override
-    public Project updateProject(Project project) {
-        Optional<Project>existing = repo.findById(project.getProjectId());
-
-        if (existing.isPresent()) {
-            Project old = existing.get();
-            old.setProjectName(project.getProjectName());
-            old.setStartDate(project.getStartDate());
-            old.setEndDate(project.getEndDate());
-            old.setClient(project.getClient());
-            old.setEmployees(project.getEmployees());
-            
-            return repo.save(old);
-        }
+    public Project updateProject(String id,Project project) {
+    	Project old = projectRepo.findById(id)
+    				  .orElseThrow(()->new RuntimeException("Project not found"));
+    	
+    	old.setProjectName(project.getProjectName());
+    	old.setStartDate(project.getStartDate());
+    	old.setEndDate(project.getEndDate());
+    	
+    	
+    	
+    	if(project.getClient()!=null && project.getClient().getClientId() != null) {
+    		String clientId = project.getClient().getClientId();
+    		
+    		
+    		
+    		Client client = clientRepo.findById(clientId)
+    						.orElseThrow(()->new RuntimeException("Client not found"));
+    		
+    		
+    		
+    		old.setClient(client);
+    		
+    	}
         
-        return null; //or throw exception 
+    	return projectRepo.save(old);
         
     }
 
     @Override
     public void deleteProject(String id) {
-    	if (!repo.existsById(id)) {
+    	if (!projectRepo.existsById(id)) {
 	        throw new RuntimeException("Invalid Project ID");
 	    }
-		repo.deleteById(id);
-        repo.deleteById(id);
+    	projectRepo.deleteById(id);
+       
+    }
+    
+    @Override
+    public Client getClientByProjectId(String projectId) {
+    	Project project  = projectRepo.findById(projectId)
+    				       .orElseThrow(()-> new RuntimeException("Project not found"));
+    	
+    	if (project.getClient() == null) {
+            throw new RuntimeException("No client assigned to this project");
+        }
+    	
+    	return project.getClient();
+    }
+    
+    @Override
+    public List<Employee>getEmployeesByProjectId(String projectId){
+    	Project project = projectRepo.findById(projectId)
+    					  .orElseThrow(()->new RuntimeException("Project not found"));
+    	if(project.getEmployees()==null) {
+    		throw new RuntimeException("No Employees assigned to this project");
+    	}
+    	return project.getEmployees();
+    	
     }
 }
+
+
+
+
+
+
