@@ -67,21 +67,32 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public Employee updateEmployee(String id, Employee emp) {
-		Optional<Employee> existing = employeeRepo.findById(id);
-		if (existing.isPresent()) {
-			Employee old = existing.get();
-			old.setName(emp.getName());
-			old.setDept(emp.getDept());
-			old.setPhone(emp.getPhone());
-			old.setProject(emp.getProject()); // project can be null
-			
-			String empid = old.getEmployeeId();
-			
-			
-		
-			return employeeRepo.save(old);
-		}
-		return null; // throw exception
+
+	    Employee old = employeeRepo.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Employee not found"));
+	    
+	    
+
+	    old.setName(emp.getName());
+	    old.setDept(emp.getDept());
+	    old.setPhone(emp.getPhone());
+	    
+	    
+	    if (emp.getProject() != null && emp.getProject().getProjectId() != null) {
+	    	
+	    	
+
+	        String projectId = emp.getProject().getProjectId();
+
+	        Project project = projectRepo.findById(projectId)
+	                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+	        old.setProject(project);
+	    } else {
+	        old.setProject(null); // optional (bench case)
+	    }
+
+	    return employeeRepo.save(old);
 	}
 
 	@Override

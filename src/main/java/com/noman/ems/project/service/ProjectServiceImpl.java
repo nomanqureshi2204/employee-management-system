@@ -104,9 +104,11 @@ public class ProjectServiceImpl implements ProjectService {
     public List<Employee>getEmployeesByProjectId(String projectId){
     	Project project = projectRepo.findById(projectId)
     					  .orElseThrow(()->new RuntimeException("Project not found"));
+    	
     	if(project.getEmployees()==null) {
     		throw new RuntimeException("No Employees assigned to this project");
     	}
+    	
     	return project.getEmployees();
     	
     }

@@ -44,7 +44,7 @@ public class Employee {
 	// Many employee can belong to one project
 	@ManyToOne
 	@JoinColumn(name = "project_id")
-	@JsonIgnore
+	@JsonIgnoreProperties({"employees"})
 	private Project project;
 	
 	

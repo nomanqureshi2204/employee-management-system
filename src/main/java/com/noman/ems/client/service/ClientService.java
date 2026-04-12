@@ -3,6 +3,7 @@ package com.noman.ems.client.service;
 import java.util.List;
 
 import com.noman.ems.client.entity.Client;
+import com.noman.ems.project.entity.Project;
 
 public interface ClientService {
 	 	Client add(Client client);
@@ -10,6 +11,8 @@ public interface ClientService {
 	    Client getClientById(String id);
 	    Client updateClient(Client client);
 	    void deleteClient(String id);
+	    
+	    List<Project>getProjectsByClientId(String clientId);
 }
 
 

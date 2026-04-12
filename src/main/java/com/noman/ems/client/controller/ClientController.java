@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.noman.ems.client.entity.Client;
 import com.noman.ems.client.service.ClientService;
+import com.noman.ems.project.entity.Project;
 
 @RestController
 @RequestMapping("clients")
@@ -52,6 +53,13 @@ public class ClientController {
 		service.deleteClient(id);
 		return "Client deleted Successfully with id: "+id;
 	}
+	
+	//get project details from the client id 
+	@GetMapping("/client/{clientId}/projects")
+	public List<Project> getProjectDetailsFromClientId(@PathVariable String clientId) {
+		return service.getProjectsByClientId(clientId);
+	}
+	
 }
 
 

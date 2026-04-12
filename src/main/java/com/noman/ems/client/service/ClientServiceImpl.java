@@ -8,17 +8,18 @@ import org.springframework.stereotype.Service;
 
 import com.noman.ems.client.entity.Client;
 import com.noman.ems.client.repository.ClientRepository;
+import com.noman.ems.project.entity.Project;
 import com.noman.ems.util.IdGenerator;
 
 @Service
 public class ClientServiceImpl implements ClientService{
-	@Autowired ClientRepository repo;
+	@Autowired ClientRepository clientRepo;
 	
 	// add a new client with auto-generated ID 
 	@Override
     public Client add(Client client) {
 		//get last client ID fron DB 
-		String lastId = repo.findTopByOrderByClientIdDesc()
+		String lastId = clientRepo.findTopByOrderByClientIdDesc()
 				.map(Client::getClientId)
 				.orElse(null);
 		//generate new client id 
@@ -26,23 +27,23 @@ public class ClientServiceImpl implements ClientService{
 		client.setClientId(newId);
 		
 		// save client to DB 
-        return repo.save(client);
+        return clientRepo.save(client);
     }
 
     @Override
     public List<Client> getAllClients() {
-        return repo.findAll();
+        return clientRepo.findAll();
     }
 
     @Override
     public Client getClientById(String id) {
-        return repo.findById(id)
+        return clientRepo.findById(id)
         		.orElseThrow(()->new RuntimeException("Client not found"));
     }
     
     @Override
     public Client updateClient(Client client) {
-    	Optional<Client>existing = repo.findById(client.getClientId());
+    	Optional<Client>existing = clientRepo.findById(client.getClientId());
     	
     	
     	
@@ -51,7 +52,7 @@ public class ClientServiceImpl implements ClientService{
     		old.setClientName(client.getClientName());
     		old.setContactPersons(client.getContactPersons());
     		old.setRelationshipDate(client.getRelationshipDate());
-    		return repo.save(old);
+    		return clientRepo.save(old);
     	}
     	
     	return null; // or throw exception
@@ -60,9 +61,20 @@ public class ClientServiceImpl implements ClientService{
     
     @Override
     public void deleteClient(String id) {
-        repo.deleteById(id);
+    	clientRepo.deleteById(id);
     }
 	
+    @Override
+    public List<Project>getProjectsByClientId(String clientId){
+    	Client client = clientRepo.findById(clientId)
+    					.orElseThrow(()->new RuntimeException(""));
+    	
+    	if(client.getProjects() ==null) {
+    		throw new RuntimeException("No Employees assigned to this project");
+    	}
+    	
+    	return client.getProjects();
+    }
 	
 }
 
