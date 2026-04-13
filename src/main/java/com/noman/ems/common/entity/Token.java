@@ -10,43 +10,26 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
-@Entity
-// Ye class DB me ek table banayegi
-
-@NoArgsConstructor
-@AllArgsConstructor
-
-@Table(name = "tokens")
 // table ka naam
-
+@Entity
+@Table(name = "tokens")
 public class Token {
-
+	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	// auto increment id
-	private Long id;
-
-	@Column(nullable = false)
-	private String email;
-	// jis user ke liye token generate hua (employee/client)
-
-	@Column(nullable = false, unique = true)
 	private String token;
-	// unique token string (UUID use karenge)
-
-	private LocalDateTime expiryTime;
-	// token kab expire hoga (5 minutes validity)
-
+	
+	String email;
+	
+	private  LocalDateTime expiryTime;
+	
 	private boolean used;
-	// ek baar use hone ke baad true ho jayega (one-time use)
 
-	public Long getId() {
-		return id;
+	public String getToken() {
+		return token;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 	public String getEmail() {
@@ -55,14 +38,6 @@ public class Token {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
 	}
 
 	public LocalDateTime getExpiryTime() {
@@ -80,5 +55,14 @@ public class Token {
 	public void setUsed(boolean used) {
 		this.used = used;
 	}
+	
+	
 
 }
+
+
+
+
+
+
+

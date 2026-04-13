@@ -1,7 +1,9 @@
 package com.noman.ems.admin.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,9 @@ import com.noman.ems.project.entity.Project;
 import com.noman.ems.project.service.ProjectService;
 import com.noman.ems.client.entity.Client;
 import com.noman.ems.client.service.ClientService;
+import com.noman.ems.common.entity.Token;
+import com.noman.ems.common.repository.TokenRepository;
+import com.noman.ems.common.service.EmailService;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -24,12 +29,43 @@ public class AdminServiceImpl implements AdminService {
 
     @Autowired
     private ClientService clientService;
+    
+    @Autowired
+    private TokenRepository tokenRepo;
+
+    @Autowired
+    private EmailService emailService;
 
     // ================= EMPLOYEE =================
 
     @Override
     public Employee addEmployee(Employee emp) {
-        return employeeService.add(emp);
+    	
+    	//step 1 : save  employee 
+    	Employee saved = employeeService.add(emp);
+    	
+    	//step 2: generate token 
+    	String tokenStr = UUID.randomUUID().toString();
+    	
+    	System.out.println("***********ADMIN SERVICE HIT ***********");
+    	System.out.println("TOKEN: " + tokenStr);
+    	
+    	Token token = new Token();
+    	token.setToken(tokenStr);
+    	token.setEmail(saved.getEmail());
+    	token.setExpiryTime(LocalDateTime.now().plusMinutes(5));
+    	token.setUsed(false);
+    	
+    	tokenRepo.save(token);
+    	
+    	//step 3: send email 
+    	String link = "http://localhost:8080/set-password?token="+tokenStr;
+    	
+    	emailService.sendEmail(saved.getEmail(), link);
+    	
+        return saved;
+        
+        
     }
 
     @Override

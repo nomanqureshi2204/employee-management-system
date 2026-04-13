@@ -1,0 +1,74 @@
+package com.noman.ems.common.controller;
+
+import java.time.LocalDateTime;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.noman.ems.common.entity.Token;
+import com.noman.ems.common.repository.TokenRepository;
+import com.noman.ems.employee.entity.Employee;
+import com.noman.ems.employee.repository.EmployeeRepository;
+
+@RestController
+public class AuthController {
+	
+	@Autowired
+	private TokenRepository tokenRepo;
+	
+	@Autowired
+	private EmployeeRepository empRepo;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
+	@PostMapping("/set-password")
+	public String setPassword(@RequestParam String token,@RequestParam String password) {
+		
+		// 1. Token check
+		Token tk = tokenRepo.findById(token)
+				   .orElseThrow(()->new RuntimeException("Invalid token"));
+		
+		// 2. Expiry check 
+		if(tk.getExpiryTime().isBefore(LocalDateTime.now())) {
+			throw new RuntimeException("Token expired");
+		}
+		
+		// 3. already used check 
+		if(tk.isUsed()) {
+			throw new RuntimeException("Token already used");
+		}
+		
+		// 4. Employee find by email 
+		Employee emp = empRepo.findByEmail(tk.getEmail())
+				.orElseThrow(()-> new RuntimeException("Employee not found "));
+		
+		//5. password encode 
+		emp.setPassword(passwordEncoder.encode(password));
+		
+		empRepo.save(emp);
+		
+		//6. Token mark as used 
+		tk.setUsed(true);
+		tokenRepo.save(tk);
+		
+		return "Password set successfuly";
+		
+	}
+	
+	
+	
+}
+
+
+
+
+
+
+
+
+
+
