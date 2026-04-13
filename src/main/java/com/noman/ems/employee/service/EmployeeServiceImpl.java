@@ -152,6 +152,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			}else {
 				emp.setFailedAttempts(0);
 				emp.setLockTime(null);
+				emp.setAccountLocked(false);
 			}
 		}
 		
@@ -159,6 +160,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		if(passwordEncoder.matches(password, emp.getPassword())) {
 			emp.setFailedAttempts(0);
 			emp.setLockTime(null);
+			emp.setAccountLocked(false);
 			employeeRepo.save(emp);
 			
 			return "Login Successfull";
@@ -169,6 +171,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			
 			if(attempts >=5) {
 				emp.setLockTime(LocalDateTime.now().plusMinutes(5));
+				emp.setAccountLocked(true);
 			}
 			
 			employeeRepo.save(emp);

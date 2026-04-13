@@ -53,10 +53,18 @@ public class Employee {
 	// -------------------------------
 	private LocalDateTime lockTime;
     private int failedAttempts;
-//    private boolean accountLocked;
+    private boolean accountLocked;
     
 	
 	
+
+	public boolean isAccountLocked() {
+		return accountLocked;
+	}
+
+	public void setAccountLocked(boolean accountLocked) {
+		this.accountLocked = accountLocked;
+	}
 
 	public LocalDateTime getLockTime() {
 		return lockTime;
