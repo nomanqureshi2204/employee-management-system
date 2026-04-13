@@ -20,16 +20,17 @@ import com.noman.ems.project.repository.ProjectRepository;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
-	private final IdGenerator idGenerator;
+	
 	@Autowired
 	private EmployeeRepository employeeRepo;
 
 	@Autowired
 	private ProjectRepository projectRepo;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-	EmployeeServiceImpl(IdGenerator idGenerator) {
-		this.idGenerator = idGenerator;
-	}
+	
 
 	@Override
 	public Employee add(Employee emp) {
@@ -37,7 +38,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		String lastId = employeeRepo.findTopByOrderByEmployeeIdDesc().map(Employee::getEmployeeId).orElse(null);
 
 		// generate new ID safely
-		emp.setEmployeeId(idGenerator.generateEmployeeId(lastId));
+		emp.setEmployeeId(IdGenerator.generateEmployeeId(lastId));
 
 		// set joining date if null
 
@@ -135,7 +136,47 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public List<Employee> getBenchEmployee(){
 		return employeeRepo.findByProjectIsNull();
 	}
-
+	
+	
+	
+	
+	@Override
+	public String login(String email,String password) {
+		Employee emp = employeeRepo.findByEmail(email)
+				.orElseThrow(()->new RuntimeException("Invalid email"));
+		
+		//check Lock 
+		if(emp.getLockTime()!=null) {
+			if(emp.getLockTime().isAfter(LocalDateTime.now())) {
+				throw new RuntimeException("Account locked! Try after 5 menutes");
+			}else {
+				emp.setFailedAttempts(0);
+				emp.setLockTime(null);
+			}
+		}
+		
+		//password check 
+		if(passwordEncoder.matches(password, emp.getPassword())) {
+			emp.setFailedAttempts(0);
+			emp.setLockTime(null);
+			employeeRepo.save(emp);
+			
+			return "Login Successfull";
+		}
+		else {
+			int attempts = emp.getFailedAttempts()+1;
+			emp.setFailedAttempts(attempts);
+			
+			if(attempts >=5) {
+				emp.setLockTime(LocalDateTime.now().plusMinutes(5));
+			}
+			
+			employeeRepo.save(emp);
+			
+			throw new RuntimeException("Invalid password. Attempts: " + attempts);
+			
+		}
+	}
 }
 
 

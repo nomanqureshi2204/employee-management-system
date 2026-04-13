@@ -1,19 +1,33 @@
 package com.noman.ems.client.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.noman.ems.client.entity.Client;
 import com.noman.ems.client.repository.ClientRepository;
+import com.noman.ems.employee.entity.Employee;
+import com.noman.ems.employee.repository.EmployeeRepository;
 import com.noman.ems.project.entity.Project;
+import com.noman.ems.project.repository.ProjectRepository;
 import com.noman.ems.util.IdGenerator;
 
 @Service
 public class ClientServiceImpl implements ClientService{
-	@Autowired ClientRepository clientRepo;
+	
+	@Autowired
+	private ClientRepository clientRepo;
+
+	@Autowired
+	private ProjectRepository projectRepo;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
 	
 	// add a new client with auto-generated ID 
 	@Override
@@ -75,8 +89,60 @@ public class ClientServiceImpl implements ClientService{
     	
     	return client.getProjects();
     }
+    
+    @Override
+    public String login(String email,String password) {
+    	Client client = clientRepo.findByEmail(email)
+    			.orElseThrow(()->new RuntimeException("Invalid Email "));
+    	
+    	//check Lock 
+    	if(client.getLockTime()!=null) {
+    		if(client.getLockTime().isAfter(LocalDateTime.now())) {
+    			throw new RuntimeException("Account locked! Try after 5 menutes ");
+    		}
+    		else {
+    			client.setLockTime(null);
+    			client.setFailedAttempts(0);
+    		}
+    	}
+    	
+    	//password check 
+    	if(passwordEncoder.matches(password, client.getPassword())) {
+    		client.setFailedAttempts(0);
+    		client.setLockTime(null);
+    		clientRepo.save(client);
+    		
+    		return "Login Succesfull ";
+    	}
+    	else {
+    		int attempts = client.getFailedAttempts()+1;
+    		client.setFailedAttempts(attempts);
+    		
+    		if(attempts >=5) {
+    			client.setLockTime(LocalDateTime.now().plusMinutes(5));
+    		}
+    		
+    		clientRepo.save(client);
+    		
+    		throw new RuntimeException("Invalid password Attempts "+attempts);
+    	}
+    }
+    
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

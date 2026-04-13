@@ -23,36 +23,73 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="clients")
+@Table(name = "clients")
 public class Client {
 	// Client ID auto-generated like CLIENT-001
 	@Id
 	private String clientId;
-	
+
 	private String clientName;
 	private LocalDate relationshipDate;
-	
-	
-	 @Column(unique = true)
-	 private String email;
-//
-//	 private String password;
-//	 private int failedAttempts;
-//	 private boolean accountLocked;
-//	 private LocalDateTime lockTime;
 
-	
-	// One client can have  multiple projects
+	@Column(unique = true)
+	private String email;
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public int getFailedAttempts() {
+		return failedAttempts;
+	}
+
+	public void setFailedAttempts(int failedAttempts) {
+		this.failedAttempts = failedAttempts;
+	}
+
+	public boolean isAccountLocked() {
+		return accountLocked;
+	}
+
+	public void setAccountLocked(boolean accountLocked) {
+		this.accountLocked = accountLocked;
+	}
+
+	public LocalDateTime getLockTime() {
+		return lockTime;
+	}
+
+	public void setLockTime(LocalDateTime lockTime) {
+		this.lockTime = lockTime;
+	}
+
+	//
+	private String password;
+	private int failedAttempts;
+	private boolean accountLocked;
+	private LocalDateTime lockTime;
+
+	// One client can have multiple projects
 	@JsonIgnore
-	@OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
-	private List<Project>projects = new ArrayList<>();
-	
-	 // One client → many contact persons
-	@OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+	private List<Project> projects = new ArrayList<>();
+
+	// One client → many contact persons
+	@OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<ContactPerson>contactPersons = new ArrayList<>();
-	
-	
+	private List<ContactPerson> contactPersons = new ArrayList<>();
 
 	public String getClientId() {
 		return clientId;
@@ -93,16 +130,5 @@ public class Client {
 	public void setContactPersons(List<ContactPerson> contactPersons) {
 		this.contactPersons = contactPersons;
 	}
-	
-	
+
 }
-
-
-
-
-
-
-
-
-
-

@@ -8,10 +8,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.noman.ems.client.service.ClientService;
 import com.noman.ems.common.entity.Token;
 import com.noman.ems.common.repository.TokenRepository;
 import com.noman.ems.employee.entity.Employee;
 import com.noman.ems.employee.repository.EmployeeRepository;
+import com.noman.ems.employee.service.EmployeeService;
 
 @RestController
 public class AuthController {
@@ -24,6 +26,12 @@ public class AuthController {
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private EmployeeService employeeService;
+	
+	@Autowired
+	private ClientService clientService;
 	
 	@PostMapping("/set-password")
 	public String setPassword(@RequestParam String token,@RequestParam String password) {
@@ -60,7 +68,20 @@ public class AuthController {
 	}
 	
 	
+	@PostMapping("/login/employee")
+	public String loginEmployee(@RequestParam String email,
+	                            @RequestParam String password) {
+	    return employeeService.login(email, password);
+	}
 	
+	
+
+	@PostMapping("/login/client")
+	public String loginClient(@RequestParam String email,
+	                          @RequestParam String password) {
+
+	    return clientService.login(email, password);
+	}
 }
 
 

@@ -51,12 +51,28 @@ public class Employee {
 
 	// Login related fields (Phase 5 ke liye ready)
 	// -------------------------------
-
-//    private int failedAttempts;
+	private LocalDateTime lockTime;
+    private int failedAttempts;
 //    private boolean accountLocked;
-//    private LocalDateTime lockTime;
+    
 	
 	
+
+	public LocalDateTime getLockTime() {
+		return lockTime;
+	}
+
+	public void setLockTime(LocalDateTime lockTime) {
+		this.lockTime = lockTime;
+	}
+
+	public int getFailedAttempts() {
+		return failedAttempts;
+	}
+
+	public void setFailedAttempts(int failedAttempts) {
+		this.failedAttempts = failedAttempts;
+	}
 
 	public String getPassword() {
 		return password;

@@ -27,6 +27,8 @@ public interface EmployeeService {
     String releaseEmployeeFromProject(String empId,String projectId);
     
     List<Employee> getBenchEmployee();
+    
+    String login(String email,String password);
 }
 
 

@@ -47,8 +47,7 @@ public class AdminServiceImpl implements AdminService {
     	//step 2: generate token 
     	String tokenStr = UUID.randomUUID().toString();
     	
-    	System.out.println("***********ADMIN SERVICE HIT ***********");
-    	System.out.println("TOKEN: " + tokenStr);
+    
     	
     	Token token = new Token();
     	token.setToken(tokenStr);
@@ -154,7 +153,27 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Client addClient(Client client) {
-        return clientService.add(client);
+    	
+    	//step 1: save client 
+    	Client saved = clientService.add(client);
+    	
+    	//step2: generate  token 
+    	String tokenStr = UUID.randomUUID().toString();
+    	
+    	Token token  = new Token();
+    	token.setToken(tokenStr);
+    	token.setEmail(saved.getEmail());
+    	token.setExpiryTime(LocalDateTime.now().plusMinutes(5));
+    	token.setUsed(false);
+    	
+    	tokenRepo.save(token);
+    	
+    	//step 3: send Email 
+    	String link = "http://localhost:8080/set-password?token="+tokenStr;
+    	
+    	emailService.sendEmail(saved.getEmail(), link);
+    	
+    	return saved;
     }
 
     @Override
