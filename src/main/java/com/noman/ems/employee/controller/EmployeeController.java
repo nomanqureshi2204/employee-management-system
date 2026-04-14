@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.noman.ems.employee.dto.EmployeeResponseDto;
 import com.noman.ems.employee.entity.Employee;
 import com.noman.ems.employee.service.EmployeeService;
 
@@ -33,14 +34,14 @@ public class EmployeeController {
 	
 	//read all 
 	@GetMapping
-	public List<Employee>getAll(){
-		return service.getAllEmployees();
+	public List<EmployeeResponseDto>getAll(){
+		return service.getAllEmployeesDto();
 	}
 	
 	//read by id 
 	@GetMapping("/{id}")
-	public Employee getById(@PathVariable String id) {
-		return service.getEmployeeById(id);
+	public EmployeeResponseDto getById(@PathVariable String id) {
+		return service.getEmployeeByIdDto(id);
 	}
 	
 	//update 
@@ -59,14 +60,16 @@ public class EmployeeController {
 	
 	// get employee basis of email
 	@GetMapping("/email/{email}")
-	public Employee getByEmail(@PathVariable String email) {
-		return service.getEmployeeByEmail(email);
+	public EmployeeResponseDto getByEmail(@PathVariable String email) {
+		return service.getEmployeeByEmailDto(email);
 	}
 	
 	@GetMapping("date-range")
-	public List<Employee>getByDateRange(@RequestParam LocalDate startDate,
-								@RequestParam LocalDate endDate){
-		return service.getEmployeesByDateRange(startDate, endDate);
+	public List<EmployeeResponseDto>getByDateRange(
+			@RequestParam LocalDate start,
+			@RequestParam LocalDate endDate){
+		
+		return service.getEmployeesByDateRangeDto(start, endDate);
 	}	
 	
 	@PutMapping("/{empId}/assign/{projectId}")
@@ -86,9 +89,11 @@ public class EmployeeController {
 	}
 	
 	@GetMapping("/bench")
-    public List<Employee>getBenchEmployees(){
-    	return service.getBenchEmployee();
+    public List<EmployeeResponseDto>getBenchEmployees(){
+    	return service.getBenchEmployeeDto();
     }
+	
+	
 }
 
 

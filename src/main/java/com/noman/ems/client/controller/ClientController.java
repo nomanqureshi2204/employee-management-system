@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.noman.ems.client.dto.ClientResponseDto;
 import com.noman.ems.client.entity.Client;
 import com.noman.ems.client.service.ClientService;
 import com.noman.ems.project.entity.Project;
@@ -31,14 +32,14 @@ public class ClientController {
 	
 	//read all 
 	@GetMapping
-	public List<Client>getAllClients(){
-		return service.getAllClients();
+	public List<ClientResponseDto>getAllClients(){
+		return service.getAllClientsDto();
 	}
 	
 	//read by id 
 	@GetMapping("/{id}")
-	public Client getClientById(@PathVariable String id) {
-		return service.getClientById(id);
+	public ClientResponseDto getClientById(@PathVariable String id) {
+		return service.getClientByIdDto(id);
 	}
 	
 	//update 

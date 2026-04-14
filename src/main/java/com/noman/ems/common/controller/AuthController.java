@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.noman.ems.client.entity.Client;
+import com.noman.ems.client.repository.ClientRepository;
 import com.noman.ems.client.service.ClientService;
 import com.noman.ems.common.entity.Token;
 import com.noman.ems.common.repository.TokenRepository;
@@ -23,6 +25,9 @@ public class AuthController {
 	
 	@Autowired
 	private EmployeeRepository empRepo;
+	
+	@Autowired 
+	private ClientRepository clientRepo;
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -50,18 +55,28 @@ public class AuthController {
 			throw new RuntimeException("Token already used");
 		}
 		
-		// 4. Employee find by email 
-		Employee emp = empRepo.findByEmail(tk.getEmail())
-				.orElseThrow(()-> new RuntimeException("Employee not found "));
+		String email = tk.getEmail();
 		
-		//5. password encode 
-		emp.setPassword(passwordEncoder.encode(password));
+		//4. same logic for both (employee+client)
+		Employee emp = empRepo.findByEmail(email).orElse(null);
+		Client client = clientRepo.findByEmail(email).orElse(null);
 		
-		empRepo.save(emp);
+		if(emp!=null) {
+			emp.setPassword(passwordEncoder.encode(password));
+			empRepo.save(emp);
+		}
+		else if(client != null) {
+			client.setPassword(passwordEncoder.encode(password));
+			clientRepo.save(client);
+		}
+		else {
+			throw new RuntimeException("User not found");
+		}
 		
-		//6. Token mark as used 
+		//5. mark token used
 		tk.setUsed(true);
 		tokenRepo.save(tk);
+		
 		
 		return "Password set successfuly";
 		

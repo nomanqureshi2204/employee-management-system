@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.noman.ems.client.entity.Client;
 import com.noman.ems.employee.entity.Employee;
+import com.noman.ems.project.dto.ProjectResponseDto;
 import com.noman.ems.project.entity.Project;
 import com.noman.ems.project.service.ProjectService;
 
@@ -23,13 +24,13 @@ public class ProjectController {
     }
 
     @GetMapping
-    public List<Project> getAllProjects() {
-        return service.getAllProjects();
+    public List<ProjectResponseDto> getAllProjects() {
+        return service.getAllProjectsDto();
     }
 
     @GetMapping("/{id}")
-    public Project getProjectById(@PathVariable String id) {
-        return service.getProjectById(id);
+    public ProjectResponseDto getProjectById(@PathVariable String id) {
+        return service.getProjectByIdDto(id);
     }
 
     @PutMapping("{id}")

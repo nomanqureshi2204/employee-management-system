@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.noman.ems.common.entity.Token;
 import com.noman.ems.common.repository.TokenRepository;
+import com.noman.ems.employee.dto.EmployeeResponseDto;
 import com.noman.ems.employee.entity.Employee;
 import com.noman.ems.employee.repository.EmployeeRepository;
 import com.noman.ems.project.entity.Project;
@@ -179,6 +180,66 @@ public class EmployeeServiceImpl implements EmployeeService {
 			throw new RuntimeException("Invalid password. Attempts: " + attempts);
 			
 		}
+	}
+	
+	// mapper 
+	private EmployeeResponseDto convertToDto(Employee emp) {
+		
+		EmployeeResponseDto dto = new EmployeeResponseDto();
+		
+		dto.setEmployeeId(emp.getEmployeeId());
+		dto.setName(emp.getName());
+		dto.setDept(emp.getDept());
+		dto.setEmail(emp.getEmail());
+		dto.setPhone(emp.getPhone());
+		
+		if(emp.getProject() != null) {
+			dto.setProjectId(emp.getProject().getProjectId());
+		}
+		
+		return dto;
+	}
+	
+	//dto method 
+	public List<EmployeeResponseDto> getAllEmployeesDto(){
+		
+		return employeeRepo.findAll()
+				.stream()
+				.map(this::convertToDto)
+				.toList();
+	}
+	
+	@Override
+	public EmployeeResponseDto getEmployeeByIdDto(String id) {
+		Employee emp = employeeRepo.findById(id)
+				.orElseThrow(()->new RuntimeException("Employee not found"));
+		
+		return convertToDto(emp);
+	}
+	
+	@Override
+	public EmployeeResponseDto getEmployeeByEmailDto(String email) {
+		Employee emp = employeeRepo.findByEmail(email)
+				.orElseThrow(()->new RuntimeException("Employee not found"));
+		return convertToDto(emp);
+	}
+	
+	@Override
+	public List<EmployeeResponseDto>getBenchEmployeeDto(){
+		return employeeRepo.findByProjectIsNull()
+				.stream()
+				.map(this::convertToDto)
+				.toList();
+	}
+	
+	@Override
+	public List<EmployeeResponseDto>getEmployeesByDateRangeDto(LocalDate start,LocalDate end){
+		
+		return employeeRepo.findByjoiningDateBetween(start, end)
+				.stream()
+				.map(this::convertToDto)
+				.toList();
+				
 	}
 }
 

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.noman.ems.client.dto.ClientResponseDto;
 import com.noman.ems.client.entity.Client;
 import com.noman.ems.client.repository.ClientRepository;
 import com.noman.ems.employee.entity.Employee;
@@ -128,8 +129,55 @@ public class ClientServiceImpl implements ClientService{
     	}
     }
     
+    private ClientResponseDto convertToDto(Client client) {
+    	ClientResponseDto dto = new ClientResponseDto();
+    	
+    	dto.setClientId(client.getClientId());
+    	dto.setClientName(client.getClientName());
+    	dto.setEmail(client.getEmail());
+    	dto.setRelationshipDate(client.getRelationshipDate()!=null 
+    			? client.getRelationshipDate().toString() : null);
+    	
+    	// project ids 
+    	if(client.getProjects() != null) {
+    		dto.setProjectIds(client.getProjects().stream()
+    				.map(p->p.getProjectId())
+    				.toList());
+    	}
+    	
+    	if(client.getContactPersons()!=null) {
+    		dto.setContactPersons(client.getContactPersons().stream()
+    				.map(c->c.getName()).toList());
+    	}
+    	
+    	return dto;
+    }
+    
+    @Override
+    public List<ClientResponseDto>getAllClientsDto(){
+    	return clientRepo.findAll()
+    			.stream()
+    			.map(this::convertToDto)
+    			.toList();
+    }
+    
+    @Override
+    public ClientResponseDto getClientByIdDto(String id) {
+
+        Client client = clientRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+
+        return convertToDto(client);
+    }
+    
 	
 }
+
+
+
+
+
+
 
 
 
