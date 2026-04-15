@@ -3,150 +3,141 @@ package com.noman.ems.employee.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.noman.ems.project.entity.Project;
-import com.noman.ems.util.IdGenerator;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "employees")
-
 public class Employee {
 
-	@Id
-	private String employeeId;
+    @Id
+    private String employeeId;
 
-	private String name;
-	private String dept;
+    // ✅ ROLE (must be ROLE_EMPLOYEE)
+    private String role;
 
-	@Column(unique = true)
-	private String email;
+    private String name;
+    private String dept;
 
-	private String phone;
+    @Column(unique = true)
+    private String email;
 
-	private LocalDate joiningDate;
-	
-	private String password;
+    private String phone;
 
-	// Many employee can belong to one project
-	@ManyToOne
-	@JoinColumn(name = "project_id")
-	@JsonIgnoreProperties({"employees"})
-	private Project project;
-	
-	
+    private LocalDate joiningDate;
 
-	// Login related fields (Phase 5 ke liye ready)
-	// -------------------------------
-	private LocalDateTime lockTime;
+    private String password;
+
+    // 🔗 Many employees → one project
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    @JsonIgnoreProperties({"employees"})
+    private Project project;
+
+    // 🔐 Login fields
     private int failedAttempts;
     private boolean accountLocked;
-    
-	
-	
+    private LocalDateTime lockTime;
 
-	public boolean isAccountLocked() {
-		return accountLocked;
-	}
+    // =======================
+    // GETTERS & SETTERS
+    // =======================
 
-	public void setAccountLocked(boolean accountLocked) {
-		this.accountLocked = accountLocked;
-	}
+    public String getEmployeeId() {
+        return employeeId;
+    }
 
-	public LocalDateTime getLockTime() {
-		return lockTime;
-	}
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
+    }
 
-	public void setLockTime(LocalDateTime lockTime) {
-		this.lockTime = lockTime;
-	}
+    public String getRole() {
+        return role;
+    }
 
-	public int getFailedAttempts() {
-		return failedAttempts;
-	}
+    public void setRole(String role) {
+        this.role = role;
+    }
 
-	public void setFailedAttempts(int failedAttempts) {
-		this.failedAttempts = failedAttempts;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getDept() {
+        return dept;
+    }
 
-	public Employee() {
-	}
+    public void setDept(String dept) {
+        this.dept = dept;
+    }
 
-	public String getEmployeeId() {
-		return employeeId;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setEmployeeId(String employeeId) {
-		this.employeeId = employeeId;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getPhone() {
+        return phone;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
-	public String getDept() {
-		return dept;
-	}
+    public LocalDate getJoiningDate() {
+        return joiningDate;
+    }
 
-	public void setDept(String dept) {
-		this.dept = dept;
-	}
+    public void setJoiningDate(LocalDate joiningDate) {
+        this.joiningDate = joiningDate;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public String getPhone() {
-		return phone;
-	}
+    public Project getProject() {
+        return project;
+    }
 
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
+    public void setProject(Project project) {
+        this.project = project;
+    }
 
-	public LocalDate getJoiningDate() {
-		return joiningDate;
-	}
+    public int getFailedAttempts() {
+        return failedAttempts;
+    }
 
-	public void setJoiningDate(LocalDate joiningDate) {
-		this.joiningDate = joiningDate;
-	}
+    public void setFailedAttempts(int failedAttempts) {
+        this.failedAttempts = failedAttempts;
+    }
 
-	public Project getProject() {
-		return project;
-	}
+    public boolean isAccountLocked() {
+        return accountLocked;
+    }
 
-	public void setProject(Project project) {
-		this.project = project;
-	}
+    public void setAccountLocked(boolean accountLocked) {
+        this.accountLocked = accountLocked;
+    }
 
+    public LocalDateTime getLockTime() {
+        return lockTime;
+    }
+
+    public void setLockTime(LocalDateTime lockTime) {
+        this.lockTime = lockTime;
+    }
 }

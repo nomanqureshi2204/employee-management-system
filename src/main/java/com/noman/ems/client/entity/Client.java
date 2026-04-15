@@ -8,127 +8,132 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.noman.ems.project.entity.Project;
-import com.noman.ems.util.IdGenerator;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "clients")
 public class Client {
-	// Client ID auto-generated like CLIENT-001
-	@Id
-	private String clientId;
 
-	private String clientName;
-	private LocalDate relationshipDate;
+    @Id
+    private String clientId;
 
-	@Column(unique = true)
-	private String email;
+    // ✅ ROLE (must be ROLE_CLIENT)
+    private String role;
 
-	public String getEmail() {
-		return email;
-	}
+    private String clientName;
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    @Column(unique = true)
+    private String email;
 
-	public String getPassword() {
-		return password;
-	}
+    private LocalDate relationshipDate;
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    private String password;
 
-	public int getFailedAttempts() {
-		return failedAttempts;
-	}
+    // 🔐 Login fields
+    private int failedAttempts;
+    private boolean accountLocked;
+    private LocalDateTime lockTime;
 
-	public void setFailedAttempts(int failedAttempts) {
-		this.failedAttempts = failedAttempts;
-	}
+    // 🔗 One client → many projects
+    @JsonIgnore
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    private List<Project> projects = new ArrayList<>();
 
-	public boolean isAccountLocked() {
-		return accountLocked;
-	}
+    // 🔗 One client → many contact persons
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<ContactPerson> contactPersons = new ArrayList<>();
 
-	public void setAccountLocked(boolean accountLocked) {
-		this.accountLocked = accountLocked;
-	}
+    // =======================
+    // GETTERS & SETTERS
+    // =======================
 
-	public LocalDateTime getLockTime() {
-		return lockTime;
-	}
+    public String getClientId() {
+        return clientId;
+    }
 
-	public void setLockTime(LocalDateTime lockTime) {
-		this.lockTime = lockTime;
-	}
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
 
-	//
-	private String password;
-	private int failedAttempts;
-	private boolean accountLocked;
-	private LocalDateTime lockTime;
+    public String getRole() {
+        return role;
+    }
 
-	// One client can have multiple projects
-	@JsonIgnore
-	@OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-	private List<Project> projects = new ArrayList<>();
+    public void setRole(String role) {
+        this.role = role;
+    }
 
-	// One client → many contact persons
-	@OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-	@JsonManagedReference
-	private List<ContactPerson> contactPersons = new ArrayList<>();
+    public String getClientName() {
+        return clientName;
+    }
 
-	public String getClientId() {
-		return clientId;
-	}
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
 
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public String getClientName() {
-		return clientName;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public void setClientName(String clientName) {
-		this.clientName = clientName;
-	}
+    public LocalDate getRelationshipDate() {
+        return relationshipDate;
+    }
 
-	public LocalDate getRelationshipDate() {
-		return relationshipDate;
-	}
+    public void setRelationshipDate(LocalDate relationshipDate) {
+        this.relationshipDate = relationshipDate;
+    }
 
-	public void setRelationshipDate(LocalDate relationshipDate) {
-		this.relationshipDate = relationshipDate;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public List<Project> getProjects() {
-		return projects;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public void setProjects(List<Project> projects) {
-		this.projects = projects;
-	}
+    public int getFailedAttempts() {
+        return failedAttempts;
+    }
 
-	public List<ContactPerson> getContactPersons() {
-		return contactPersons;
-	}
+    public void setFailedAttempts(int failedAttempts) {
+        this.failedAttempts = failedAttempts;
+    }
 
-	public void setContactPersons(List<ContactPerson> contactPersons) {
-		this.contactPersons = contactPersons;
-	}
+    public boolean isAccountLocked() {
+        return accountLocked;
+    }
 
+    public void setAccountLocked(boolean accountLocked) {
+        this.accountLocked = accountLocked;
+    }
+
+    public LocalDateTime getLockTime() {
+        return lockTime;
+    }
+
+    public void setLockTime(LocalDateTime lockTime) {
+        this.lockTime = lockTime;
+    }
+
+    public List<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<Project> projects) {
+        this.projects = projects;
+    }
+
+    public List<ContactPerson> getContactPersons() {
+        return contactPersons;
+    }
+
+    public void setContactPersons(List<ContactPerson> contactPersons) {
+        this.contactPersons = contactPersons;
+    }
 }
