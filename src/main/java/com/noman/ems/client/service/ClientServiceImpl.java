@@ -1,51 +1,57 @@
 package com.noman.ems.client.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.noman.ems.client.dto.ClientResponseDto;
 import com.noman.ems.client.entity.Client;
 import com.noman.ems.client.repository.ClientRepository;
-import com.noman.ems.employee.entity.Employee;
-import com.noman.ems.employee.repository.EmployeeRepository;
-import com.noman.ems.exception.ResourceNotFoundException;
 import com.noman.ems.project.entity.Project;
 import com.noman.ems.project.repository.ProjectRepository;
+import com.noman.ems.user.entity.User;
+import com.noman.ems.user.repository.UserRepository;
 import com.noman.ems.util.IdGenerator;
 
 @Service
-public class ClientServiceImpl implements ClientService{
-	
-	@Autowired
-	private ClientRepository clientRepo;
+public class ClientServiceImpl implements ClientService {
 
-	@Autowired
-	private ProjectRepository projectRepo;
-	
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-	
-	
-	// add a new client with auto-generated ID 
-	@Override
+    @Autowired
+    private ClientRepository clientRepo;
+
+    @Autowired
+    private ProjectRepository projectRepo;
+
+    @Autowired
+    private UserRepository userRepo;
+
+    // ================= CREATE =================
+    @Override
     public Client add(Client client) {
-		//get last client ID fron DB 
-		String lastId = clientRepo.findTopByOrderByClientIdDesc()
-				.map(Client::getClientId)
-				.orElse(null);
-		//generate new client id 
-		String newId = IdGenerator.generateClientId(lastId);
-		client.setClientId(newId);
-		
-		// save client to DB 
+
+        String lastId = clientRepo.findTopByOrderByClientIdDesc()
+                .map(Client::getClientId)
+                .orElse(null);
+
+        client.setClientId(IdGenerator.generateClientId(lastId));
+
+        // 🔥 पहले User बनाओ
+        User user = new User();
+        user.setEmail(client.getUser().getEmail());
+        user.setRole("ROLE_CLIENT");
+        user.setEnabled(true);
+
+        User savedUser = userRepo.save(user);
+
+        // 🔗 mapping
+        client.setUser(savedUser);
+
         return clientRepo.save(client);
     }
 
+    // ================= READ =================
     @Override
     public List<Client> getAllClients() {
         return clientRepo.findAll();
@@ -54,145 +60,73 @@ public class ClientServiceImpl implements ClientService{
     @Override
     public Client getClientById(String id) {
         return clientRepo.findById(id)
-        		.orElseThrow(()->new ResourceNotFoundException("Client not found"));
+                .orElseThrow(() -> new RuntimeException("Client not found"));
     }
-    
+
+    // ================= UPDATE =================
     @Override
     public Client updateClient(Client client) {
-    	Optional<Client>existing = clientRepo.findById(client.getClientId());
-    	
-    	
-    	
-    	if(existing.isPresent()) {
-    		Client old = existing.get();
-    		old.setClientName(client.getClientName());
-    		old.setContactPersons(client.getContactPersons());
-    		old.setRelationshipDate(client.getRelationshipDate());
-    		return clientRepo.save(old);
-    	}
-    	
-    	return null; // or throw exception
-    	
+
+        Client old = clientRepo.findById(client.getClientId())
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+
+        old.setClientName(client.getClientName());
+        old.setRelationshipDate(client.getRelationshipDate());
+        old.setContactPersons(client.getContactPersons());
+
+        return clientRepo.save(old);
     }
-    
+
+    // ================= DELETE =================
     @Override
     public void deleteClient(String id) {
-    	clientRepo.deleteById(id);
+        if (!clientRepo.existsById(id)) {
+            throw new RuntimeException("Invalid client id");
+        }
+        clientRepo.deleteById(id);
     }
-	
+
+    // ================= PROJECT =================
     @Override
-    public List<Project>getProjectsByClientId(String clientId){
-    	Client client = clientRepo.findById(clientId)
-    					.orElseThrow(()->new ResourceNotFoundException("No prject is found with this client id "));
-    	
-    	if(client.getProjects() ==null) {
-    		throw new ResourceNotFoundException("No Employees assigned to this project");
-    	}
-    	
-    	return client.getProjects();
+    public List<Project> getProjectsByClientId(String clientId) {
+
+        Client client = clientRepo.findById(clientId)
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+
+        return client.getProjects();
     }
-    
-    @Override
-    public String login(String email,String password) {
-    	Client client = clientRepo.findByEmail(email)
-    			.orElseThrow(()->new ResourceNotFoundException("Invalid Email "));
-    	
-    	//check Lock 
-    	if(client.getLockTime()!=null) {
-    		if(client.getLockTime().isAfter(LocalDateTime.now())) {
-    			throw new ResourceNotFoundException("Account locked! Try after 5 menutes ");
-    		}
-    		else {
-    			client.setLockTime(null);
-    			client.setFailedAttempts(0);
-    		}
-    	}
-    	
-    	//password check 
-    	if(passwordEncoder.matches(password, client.getPassword())) {
-    		client.setFailedAttempts(0);
-    		client.setLockTime(null);
-    		client.setAccountLocked(false);
-    		clientRepo.save(client);
-    		
-    		return "Login Succesfull ";
-    	}
-    	else {
-    		int attempts = client.getFailedAttempts()+1;
-    		client.setFailedAttempts(attempts);
-    		
-    		if(attempts >=5) {
-    			client.setLockTime(LocalDateTime.now().plusMinutes(5));
-    		}
-    		
-    		clientRepo.save(client);
-    		
-    		throw new ResourceNotFoundException("Invalid password Attempts "+attempts);
-    	}
-    }
-    
+
+    // ================= DTO =================
     private ClientResponseDto convertToDto(Client client) {
-    	ClientResponseDto dto = new ClientResponseDto();
-    	
-    	dto.setClientId(client.getClientId());
-    	dto.setClientName(client.getClientName());
-    	dto.setEmail(client.getEmail());
-    	dto.setRelationshipDate(client.getRelationshipDate()!=null 
-    			? client.getRelationshipDate().toString() : null);
-    	
-    	// project ids 
-    	if(client.getProjects() != null) {
-    		dto.setProjectIds(client.getProjects().stream()
-    				.map(p->p.getProjectId())
-    				.toList());
-    	}
-    	
-    	if(client.getContactPersons()!=null) {
-    		dto.setContactPersons(client.getContactPersons().stream()
-    				.map(c->c.getName()).toList());
-    	}
-    	
-    	return dto;
+
+        ClientResponseDto dto = new ClientResponseDto();
+
+        dto.setClientId(client.getClientId());
+        dto.setClientName(client.getClientName());
+        dto.setEmail(client.getUser().getEmail());
+
+        if (client.getProjects() != null) {
+            dto.setProjectIds(
+                    client.getProjects()
+                            .stream()
+                            .map(Project::getProjectId)
+                            .collect(Collectors.toList())
+            );
+        }
+
+        return dto;
     }
-    
+
     @Override
-    public List<ClientResponseDto>getAllClientsDto(){
-    	return clientRepo.findAll()
-    			.stream()
-    			.map(this::convertToDto)
-    			.toList();
+    public List<ClientResponseDto> getAllClientsDto() {
+        return clientRepo.findAll()
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
-    
+
     @Override
     public ClientResponseDto getClientByIdDto(String id) {
-
-        Client client = clientRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
-
-        return convertToDto(client);
+        return convertToDto(getClientById(id));
     }
-    
-	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

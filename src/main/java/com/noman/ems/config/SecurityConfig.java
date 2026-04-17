@@ -12,13 +12,45 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable() // CSRF disable (dev ke liye)
+
+        http
+            .csrf(csrf -> csrf.disable())
+
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll() // Sab endpoints open
-            );
+
+                // ✅ Swagger allow
+                .requestMatchers(
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui.html"
+                ).permitAll()
+
+                // ✅ Auth APIs allow
+                .requestMatchers(
+                        "/set-password",
+                        "/login/**"
+                ).permitAll()
+
+                // ✅ TEMP: allow employee & client APIs (testing ke liye)
+                .requestMatchers(
+                        "/employees/**",
+                        "/clients/**"
+                ).permitAll()
+
+                // 🔒 baaki sab secure
+                .anyRequest().authenticated()
+            )
+
+            // ❌ Disable default login page
+            .formLogin(form -> form.disable())
+
+            // ❌ Disable basic auth popup
+            .httpBasic(basic -> basic.disable());
+
         return http.build();
     }
-    
+
+    // 🔐 Password Encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

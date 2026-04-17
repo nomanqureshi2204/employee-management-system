@@ -3,10 +3,12 @@ package com.noman.ems.client.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.noman.ems.client.entity.ContactPerson;
 import com.noman.ems.client.repository.ContactPersonRepository;
 
+@Service
 public class ContactPersonImpl implements ContactPersonService {
 
 	@Autowired

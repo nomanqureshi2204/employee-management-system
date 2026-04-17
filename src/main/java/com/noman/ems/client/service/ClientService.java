@@ -14,7 +14,7 @@ public interface ClientService {
 	    void deleteClient(String id);
 	    
 	    List<Project>getProjectsByClientId(String clientId);
-	    String login(String email,String password);
+	
 	    
 	    List<ClientResponseDto>getAllClientsDto();
 	    ClientResponseDto getClientByIdDto(String id);

@@ -51,7 +51,7 @@ public class AdminServiceImpl implements AdminService {
     	
     	Token token = new Token();
     	token.setToken(tokenStr);
-    	token.setEmail(saved.getEmail());
+    	token.setEmail(saved.getUser().getEmail());
     	token.setExpiryTime(LocalDateTime.now().plusMinutes(5));
     	token.setUsed(false);
     	
@@ -60,7 +60,7 @@ public class AdminServiceImpl implements AdminService {
     	//step 3: send email 
     	String link = "http://localhost:8080/set-password?token="+tokenStr;
     	
-    	emailService.sendEmail(saved.getEmail(), link);
+    	emailService.sendEmail(saved.getUser().getEmail(), link);
     	
         return saved;
         
@@ -162,7 +162,7 @@ public class AdminServiceImpl implements AdminService {
     	
     	Token token  = new Token();
     	token.setToken(tokenStr);
-    	token.setEmail(saved.getEmail());
+    	token.setEmail(saved.getUser().getEmail());
     	token.setExpiryTime(LocalDateTime.now().plusMinutes(5));
     	token.setUsed(false);
     	
@@ -171,7 +171,7 @@ public class AdminServiceImpl implements AdminService {
     	//step 3: send Email 
     	String link = "http://localhost:8080/set-password?token="+tokenStr;
     	
-    	emailService.sendEmail(saved.getEmail(), link);
+    	emailService.sendEmail(saved.getUser().getEmail(), link);
     	
     	return saved;
     }

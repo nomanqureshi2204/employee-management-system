@@ -9,5 +9,5 @@ import com.noman.ems.employee.entity.Employee;
 
 public interface ClientRepository extends JpaRepository<Client, String>{
 	Optional<Client> findTopByOrderByClientIdDesc();
-	Optional<Client> findByEmail(String email);
+	Optional<Client> findByUser_Email(String email);
 }
