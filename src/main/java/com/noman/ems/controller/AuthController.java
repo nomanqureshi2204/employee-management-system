@@ -1,0 +1,52 @@
+package com.noman.ems.controller;
+
+import java.time.LocalDateTime;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import com.noman.ems.entity.Token;
+import com.noman.ems.repository.TokenRepository;
+import com.noman.ems.service.AuthService;
+import com.noman.ems.entity.User;
+import com.noman.ems.repository.UserRepository;
+
+@RestController
+@RequestMapping("/auth")
+public class AuthController {
+
+    @Autowired
+    private TokenRepository tokenRepo;
+
+    @Autowired
+    private UserRepository userRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private AuthService authService;
+
+    // ===============================
+    // 🔐 SET PASSWORD USING TOKEN
+    // ===============================
+    @PostMapping("/set-password")
+    public String setPassword(@RequestParam String token,
+                              @RequestParam String password) {
+
+        return authService.setPassword(token, password);
+    }
+
+    // ===============================
+    // 🔐 LOGIN (COMMON FOR ALL ROLES)
+    // ===============================
+   
+
+    @PostMapping("/login")
+    public Object login(@RequestParam String email,
+                        @RequestParam String password) {
+
+        return authService.login(email, password);
+    }
+}
