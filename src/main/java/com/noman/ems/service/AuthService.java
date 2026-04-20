@@ -53,49 +53,5 @@ public class AuthService {
         return "Password set successfully";
     }
 
-    public Object login(String email, String password) {
-    	
-    	System.out.println("######################"+email);
-    	System.out.println(userRepo.findByEmail(email));
-        User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Invalid email nanan"));
-        
-        // 🔒 lock check
-        if (user.isAccountLocked()) {
-            if (user.getLockTime().isAfter(LocalDateTime.now())) {
-                throw new RuntimeException("Account locked! Try after 5 minutes");
-            } else {
-                user.setAccountLocked(false);
-                user.setFailedAttempts(0);
-            }
-        }
-
-        // 🔐 password check
-        if (passwordEncoder.matches(password, user.getPassword())) {
-
-            user.setFailedAttempts(0);
-            user.setAccountLocked(false);
-            userRepo.save(user);
-
-            return Map.of(
-                "message", "Login Successful",
-                "role", user.getRole(),
-                "email", user.getEmail()
-            );
-
-        } else {
-
-            int attempts = user.getFailedAttempts() + 1;
-            user.setFailedAttempts(attempts);
-
-            if (attempts >= 5) {
-                user.setAccountLocked(true);
-                user.setLockTime(LocalDateTime.now().plusMinutes(5));
-            }
-
-            userRepo.save(user);
-
-            throw new RuntimeException("Invalid password. Attempts: " + attempts);
-        }
-    }
+    
 }

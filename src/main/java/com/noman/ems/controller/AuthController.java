@@ -1,14 +1,24 @@
 package com.noman.ems.controller;
 
+//import com.noman.ems.service.SessionService;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.noman.ems.entity.Token;
 import com.noman.ems.repository.TokenRepository;
 import com.noman.ems.service.AuthService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 import com.noman.ems.entity.User;
 import com.noman.ems.repository.UserRepository;
 
@@ -16,7 +26,9 @@ import com.noman.ems.repository.UserRepository;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
+
+
+	@Autowired
     private TokenRepository tokenRepo;
 
     @Autowired
@@ -28,6 +40,8 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+
+
     // ===============================
     // 🔐 SET PASSWORD USING TOKEN
     // ===============================
@@ -38,15 +52,23 @@ public class AuthController {
         return authService.setPassword(token, password);
     }
 
-    // ===============================
-    // 🔐 LOGIN (COMMON FOR ALL ROLES)
-    // ===============================
    
 
-    @PostMapping("/login")
-    public Object login(@RequestParam String email,
-                        @RequestParam String password) {
+    
+    
+    @PostMapping("/logout")
+    public String logout(HttpServletRequest request) {
 
-        return authService.login(email, password);
+        request.getSession().invalidate(); // session delete 
+        SecurityContextHolder.clearContext(); //spring clear
+
+       
+
+        return "Logout successful";
     }
 }
+
+
+
+
+

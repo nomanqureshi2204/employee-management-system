@@ -20,9 +20,19 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        
+        // Lock Check 
+        if(user.isAccountLocked()) {
+        	if(user.getLockTime().isAfter(LocalDateTime.now())) {
+        		throw new RuntimeException("Account locked! Try later");
+        	}else {
+        		user.setAccountLocked(false);
+        		user.setFailedAttempts(0);
+        		userRepo.save(user);
+        	}
+        }
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),

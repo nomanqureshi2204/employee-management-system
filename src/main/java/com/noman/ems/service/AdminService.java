@@ -53,7 +53,7 @@ public interface AdminService {
 
     Client getClientById(String id);
 
-    Client updateClient(Client client);
+    Client updateClient(String id ,Client client);
 
     void deleteClient(String id);
 

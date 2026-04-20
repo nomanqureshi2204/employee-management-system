@@ -9,12 +9,13 @@ import org.springframework.stereotype.Service;
 
 import com.noman.ems.dto.ClientResponseDto;
 import com.noman.ems.entity.Client;
+import com.noman.ems.entity.Employee;
 import com.noman.ems.repository.ClientRepository;
 import com.noman.ems.entity.Project;
 import com.noman.ems.repository.ProjectRepository;
-import com.noman.ems.service.ClientService;
 import com.noman.ems.entity.User;
 import com.noman.ems.repository.UserRepository;
+import com.noman.ems.service.ClientService;
 import com.noman.ems.util.IdGenerator;
 
 @Service
@@ -69,12 +70,15 @@ public class ClientServiceImpl implements ClientService {
         return clientRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Client not found"));
     }
+    
+    
+ 
 
     // ================= UPDATE =================
     @Override
-    public Client updateClient(Client client) {
+    public Client updateClient(String  id,Client client) {
 
-        Client old = clientRepo.findById(client.getClientId())
+        Client old = clientRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Client not found"));
 
         old.setClientName(client.getClientName());

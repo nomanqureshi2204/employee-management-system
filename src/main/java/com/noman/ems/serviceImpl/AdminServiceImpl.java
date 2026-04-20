@@ -203,8 +203,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Client updateClient(Client client) {
-        return clientService.updateClient(client);
+    public Client updateClient(String id ,Client client) {
+        return clientService.updateClient(id,client);
     }
 
     @Override
