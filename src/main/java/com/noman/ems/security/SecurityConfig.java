@@ -4,18 +4,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.noman.ems.entity.User;
 import com.noman.ems.repository.UserRepository;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 
 @Configuration
 public class SecurityConfig {
@@ -24,13 +30,13 @@ public class SecurityConfig {
     private CustomUserDetailsService userDetailsService;
 
     @Autowired
-    private CustomAuthFailureHandler failureHandler;
-
-    @Autowired
-    private CustomAuthSuccessHandler successHandler;
+    private CustomAuthenticationEntryPoint entryPoint;
 
     @Autowired
     private CustomAccessDeniedHandler accessDeniedHandler;
+    
+    @Autowired
+    private JwtFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,29 +44,26 @@ public class SecurityConfig {
         http
             // ❌ disable CSRF (REST ke liye)
             .csrf(AbstractHttpConfigurer::disable)
+            
+            .exceptionHandling(ex -> ex
+            	    .authenticationEntryPoint(entryPoint)  
+            	    .accessDeniedHandler(accessDeniedHandler)
+            	)
 
-            // ❌ disable basic auth
-            .httpBasic(AbstractHttpConfigurer::disable)
-
-            // 🔥 CUSTOM LOGIN ENABLE
-            .formLogin(form -> form
-                    .loginProcessingUrl("/login")   // 🔥 yahi endpoint hit hoga
-                    .successHandler(successHandler)
-                    .failureHandler(failureHandler)
-                    .permitAll()
+            // jwt -> STATELESS (NO SESSION)
+            .sessionManagement(session -> session
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
+                
 
             // ❌ custom exception handling
             .exceptionHandling(ex -> ex
                     .accessDeniedHandler(accessDeniedHandler)
             )
 
-            // 🔐 session management
-            .sessionManagement(session -> session
-                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            )
+            
 
-            // 🔐 authorization rules
+            // authorization rules
             .authorizeHttpRequests(auth -> auth
 
                     // Swagger allow
@@ -80,15 +83,14 @@ public class SecurityConfig {
 
                     // baki sab login required
                     .anyRequest().authenticated()
-            )
+            );
 
-            // 🔥 userDetailsService connect
-            .userDetailsService(userDetailsService);
+            http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // 🔐 password encoder
+    //  password encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -116,12 +118,34 @@ public class SecurityConfig {
         };
     }
 
-    // Swagger config
+    
+    
+    
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+    
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
                         .title("EMS API")
-                        .version("1.0"));
+                        .version("1.0"))
+
+                // 🔐 Add JWT security
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                .components(new Components()
+                        .addSecuritySchemes("bearerAuth",
+                                new SecurityScheme()
+                                        .name("Authorization")
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                        )
+                );
     }
+    
 }
+
+
