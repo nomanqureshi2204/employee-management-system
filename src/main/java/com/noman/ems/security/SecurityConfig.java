@@ -26,126 +26,96 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 @Configuration
 public class SecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+	@Autowired
+	private CustomUserDetailsService userDetailsService;
 
-    @Autowired
-    private CustomAuthenticationEntryPoint entryPoint;
+	@Autowired
+	private CustomAuthenticationEntryPoint entryPoint;
 
-    @Autowired
-    private CustomAccessDeniedHandler accessDeniedHandler;
-    
-    @Autowired
-    private JwtFilter jwtFilter;
+	@Autowired
+	private CustomAccessDeniedHandler accessDeniedHandler;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	@Autowired
+	private JwtFilter jwtFilter;
 
-        http
-            // ❌ disable CSRF (REST ke liye)
-            .csrf(AbstractHttpConfigurer::disable)
-            
-            .exceptionHandling(ex -> ex
-            	    .authenticationEntryPoint(entryPoint)  
-            	    .accessDeniedHandler(accessDeniedHandler)
-            	)
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-            // jwt -> STATELESS (NO SESSION)
-            .sessionManagement(session -> session
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-                
+		http
+				// ❌ disable CSRF (REST ke liye)
+				.csrf(AbstractHttpConfigurer::disable)
 
-            // ❌ custom exception handling
-            .exceptionHandling(ex -> ex
-                    .accessDeniedHandler(accessDeniedHandler)
-            )
+				.exceptionHandling(
+						ex -> ex.authenticationEntryPoint(entryPoint).accessDeniedHandler(accessDeniedHandler))
 
-            
+				// jwt -> STATELESS (NO SESSION)
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            // authorization rules
-            .authorizeHttpRequests(auth -> auth
+				// ❌ custom exception handling
+				.exceptionHandling(ex -> ex.accessDeniedHandler(accessDeniedHandler))
 
-                    // Swagger allow
-                    .requestMatchers(
-                            "/swagger-ui/**",
-                            "/v3/api-docs/**",
-                            "/swagger-ui.html"
-                    ).permitAll()
+				// authorization rules
+				.authorizeHttpRequests(auth -> auth
 
-                    // public APIs
-                    .requestMatchers("/auth/**").permitAll()
+						// Swagger allow
+						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
 
-                    // role-based access
-                    .requestMatchers("/admin/**", "/projects/**").hasRole("ADMIN")
-                    .requestMatchers("/employees/**").hasAnyRole("EMPLOYEE", "ADMIN")
-                    .requestMatchers("/clients/**").hasAnyRole("CLIENT", "ADMIN")
+						// public APIs
+						.requestMatchers("/auth/**").permitAll()
 
-                    // baki sab login required
-                    .anyRequest().authenticated()
-            );
+						// role-based access
+						.requestMatchers("/admin/**", "/projects/**").hasRole("ADMIN").requestMatchers("/employees/**")
+						.hasAnyRole("EMPLOYEE", "ADMIN").requestMatchers("/clients/**").hasAnyRole("CLIENT", "ADMIN")
 
-            http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+						// baki sab login required
+						.anyRequest().authenticated());
 
-        return http.build();
-    }
+		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-    //  password encoder
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+		return http.build();
+	}
 
-    // 👇 auto admin create
-    @Bean
-    CommandLineRunner createAdmin(UserRepository userRepo, PasswordEncoder encoder) {
-        return args -> {
+	// password encoder
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-            if (userRepo.findByEmail("admin@gmail.com").isEmpty()) {
+	// 👇 auto admin create
+	@Bean
+	CommandLineRunner createAdmin(UserRepository userRepo, PasswordEncoder encoder) {
+		return args -> {
 
-                User admin = new User();
-                admin.setEmail("admin@gmail.com");
-                admin.setPassword(encoder.encode("admin123"));
-                admin.setRole("ROLE_ADMIN");
-                admin.setEnabled(true);
-                admin.setFailedAttempts(0);
-                admin.setAccountLocked(false);
+			if (userRepo.findByEmail("admin@gmail.com").isEmpty()) {
 
-                userRepo.save(admin);
+				User admin = new User();
+				admin.setEmail("admin@gmail.com");
+				admin.setPassword(encoder.encode("admin123"));
+				admin.setRole("ROLE_ADMIN");
+				admin.setEnabled(true);
+				admin.setFailedAttempts(0);
+				admin.setAccountLocked(false);
 
-                System.out.println("Admin created automatically");
-            }
-        };
-    }
+				userRepo.save(admin);
 
-    
-    
-    
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
-    
-    @Bean
-    public OpenAPI customOpenAPI() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title("EMS API")
-                        .version("1.0"))
+				System.out.println("Admin created automatically");
+			}
+		};
+	}
 
-                // 🔐 Add JWT security
-                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
-                .components(new Components()
-                        .addSecuritySchemes("bearerAuth",
-                                new SecurityScheme()
-                                        .name("Authorization")
-                                        .type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer")
-                                        .bearerFormat("JWT")
-                        )
-                );
-    }
-    
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+		return config.getAuthenticationManager();
+	}
+
+	@Bean
+	public OpenAPI customOpenAPI() {
+		return new OpenAPI().info(new Info().title("EMS API").version("1.0"))
+
+				// 🔐 Add JWT security
+				.addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+				.components(new Components().addSecuritySchemes("bearerAuth", new SecurityScheme().name("Authorization")
+						.type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")));
+	}
+
 }
-
-

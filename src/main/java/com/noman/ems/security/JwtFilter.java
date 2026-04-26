@@ -48,17 +48,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 String email = jwtUtil.extractEmail(token);
 
-                // 🔒 avoid duplicate authentication
+                // avoid duplicate authentication
                 if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
                     UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities()
-                            );
+                    UsernamePasswordAuthenticationToken auth = 
+                    		new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities());
+            
 
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
